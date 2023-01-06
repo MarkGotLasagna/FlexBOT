@@ -33,17 +33,17 @@ Commands registered _by default_ are:
     - _pinging_ the WebSocket to check latency (🏓 Ping)
     - _get info_ about the BOT's properties (❓ Info)
     - get _available_ audio sources (💿 Sources)
-- `/j` to __join__ the same voice channel the user is connected to
+- `/j` to __join__ the voice channel
 - `/l` to __leave__ the voice channel
-- `/r` to __play__ a __random__ audio source
-- `/p` to __join__ and __play__ an audio source
+- `/r` to __randomly__ play an audio source
+- `/p` to __play__ an audio source
 - `/s` to __skip__ the playing audio source
 
 The `/p` command's syntax is `/p ogg audioSource.ogg`, meaning it only accepts an argument called `ogg`, it being the _audio source to be played_. An autocompletion utility is provided to facilitate user input.</br>
 
 `/r` is a particular _fun_ way to play audio in the voice channel as it does not have an autocomplete function.
 
-Both `/r` and `/p` will instantiate `/j` first, if necessary.
+> Both `/r` and `/p` will instantiate `/j` first, if necessary.
 
 Some __error handling__ is present.</br>
 You can change the messages to be printed if your command fails, e.g.:
