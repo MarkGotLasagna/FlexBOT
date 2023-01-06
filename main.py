@@ -212,12 +212,20 @@ try:
             await j(ctx)
         voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            return await ctx.respond(isStillPlaying, ephemeral = True)
-        source = FFmpegPCMAudio(myDirectory + ogg)
-        if (ogg) not in myOptions:
-            return await ctx.respond(notFound, ephemeral = True)
-        player = voice.play(source)
-        await ctx.respond(isPlaying, ephemeral = True)
+            player = voice.stop()
+            await ctx.respond(isSkipped, ephemeral = True)
+            source = FFmpegPCMAudio(myDirectory + ogg)
+            if (ogg) not in myOptions:
+                return await ctx.respond(notFound, ephemeral = True)
+            player = voice.play(source)
+            await ctx.respond(isPlaying, ephemeral = True)
+            # return await ctx.respond(isStillPlaying, ephemeral = True)
+        else:
+            source = FFmpegPCMAudio(myDirectory + ogg)
+            if (ogg) not in myOptions:
+                return await ctx.respond(notFound, ephemeral = True)
+            player = voice.play(source)
+            await ctx.respond(isPlaying, ephemeral = True)
     
     @myClient.slash_command(
         name = "s",

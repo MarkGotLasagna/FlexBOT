@@ -27,6 +27,12 @@ The BOT's token, used for _login_ to the WebSocket, should reside in a file call
 ```
 TOKEN = yourSecretTOKEN
 ```
+
+Registered guilds are declared inside `myGuilds`.</br>
+You must add your guild's IDs to activate the commands.
+```
+myGuilds = [ guildId1, guildId2 ]
+```
 ### Commands
 Commands registered _by default_ are:
 - `/d` for __debugging purposes__, namely
