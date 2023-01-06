@@ -1,5 +1,5 @@
 """
-    a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna now on heroku.com
+    a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna
 
     The code is designed to be as modular as possible, changes can be applied to:
     - the bot's name (myBotName)
@@ -9,12 +9,14 @@
     - the directory from where extracting audio sources (myDirectory).
 """
 
-""" 
-    MUST HAVE DEPENDENCIES
-
-    python3 -m pip install 'py-cord[voice]' \
-        'aiohttp[speedups]' \
-        'colorama'
+""" MUST HAVE DEPENDENCIES (Linux)
+    python3 -m pip install -U py-cord[speed] \ 
+        py-cord[voice] \
+        aiohttp[speedups] \
+        colorama \
+        python-dotenv \
+        PyNaCl \
+        ffmpeg-python
     sudo apt-get install ffmpeg libffi-dev libnacl-dev python3-dev
 """
 
@@ -29,32 +31,27 @@ just_fix_windows_console()
 def printInColor(arg1, arg2):
     print(f"{Back.LIGHTBLACK_EX} Initializing {str(arg1)} {str(arg2)} {Style.RESET_ALL}")
 
-#################################################################### TIMING
-# to check for slowdowns in the code
-# myTempo.start() to start the timer
-# myTempo.stop() to stop the timer and print the time
-class TimerError(Exception):
-    """ Error handling """
-class Timer:
-    def __init__(self):
-        self._start_time = None
-    
-    def start(self):
-        if self._start_time is not None:
-            raise TimerError(f"Timer started")
-        
-        self._start_time = time.perf_counter()
-    
-    def stop(self):
-        if self._start_time is None:
-            raise TimerError(f"Timer not running")
-        
-        elapsed_time = time.perf_counter() - self._start_time
-        self._start_time = None
-        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")
-
-myTempo = Timer()
-####################################################################
+######################################################################################################### TIMING
+# to check for slowdowns in the code                                                                    #
+# myTempo.start() to start the timer                                                                    #
+# myTempo.stop() to stop the timer and print the time                                                   #
+class TimerError(Exception):                                                                            #
+    """ Error handling """                                                                              #
+class Timer:                                                                                            #
+    def __init__(self):                                                                                 #
+        self._start_time = None                                                                         #
+    def start(self):                                                                                    #
+        if self._start_time is not None:                                                                #
+            raise TimerError(f"Timer started")                                                          #
+        self._start_time = time.perf_counter()                                                          #
+    def stop(self):                                                                                     #
+        if self._start_time is None:                                                                    #
+            raise TimerError(f"Timer not running")                                                      #
+        elapsed_time = time.perf_counter() - self._start_time                                           #
+        self._start_time = None                                                                         #
+        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")     #
+myTempo = Timer()                                                                                       #
+#########################################################################################################
 
 myBotName = "FlexBOT 💽"
 myDirectory = "./audio/"
@@ -141,7 +138,6 @@ async def on_ready():
     except:
         print(f"{Back.RED} Something went wrong during the initialization process {Style.RESET_ALL}")
 
-    
 ######################################################################################################################## DEFAULT SLASH COMMANDS
 # (/d) for debugging, (/j) to join voice, (/l) to leave voice, 
 # (/r) to play a random audio, (/o) for available audio sources, (/p) to play 
@@ -200,8 +196,8 @@ try:
         await ctx.respond(isPlaying, ephemeral = True)
 
     @staticmethod
-    def sourceAutocomplete(self: discord.AutocompleteContext):
-        return my_options
+    def sourceAutocomplete(ctx: discord.AutocompleteContext):
+        return [ sourceFile for sourceFile in my_options if sourceFile.startswith(ctx.value.lower()) ]
 
     @myClient.slash_command(
         name = "p",

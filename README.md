@@ -3,9 +3,13 @@
     <image src=https://img.shields.io/github/pipenv/locked/python-version/MarkGotLasagna/FlexBOT?style=plastic><image>
     <image src=https://img.shields.io/pypi/implementation/py-cord?style=plastic><image>
     <image src=https://img.shields.io/pypi/wheel/py-cord?style=plastic><image>
-    <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image></br>
-    a discord BOT written in Python for playing local audio sources
+    <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image>
+
+    </br>
+    A simple Discord BOT, written in Python, for playing local audio sources into voice channels
 </div>
+
+
 
 ## Dir structure
 ```
@@ -17,10 +21,10 @@
 ```
 
 ## How it works
-FlexBOT 💽's purpose is <u>to play audio sources stored in a local directory into a Discord voice channel</u>.</br>
-The directory to be used is to be specified in the brains of the bot [main.py](/main.py), the variable name being `myDirectory`. </br></br>
-_Audio sources_ are to be intended as __audio files__ with extension `.ogg`, since they provide a good balance between bitrate and therefor weight (same format WhatsApp uses for voice messages).</br>
-> keep in mind that changing the audio format (`.ogg` to, say, `.flac` or `.mp3`) may change performances considerably and HTTP errors may occur frequently (unsuccessful handshake or DNS lookup)</br>
+FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
+The directory to be used is specified in the brains of the bot [main.py](/main.py) (`myDirectory`). </br></br>
+_Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefor weight (same format WhatsApp uses for voice messages).</br>
+> keep in mind that changing the audio format may change performances considerably and HTTP errors may occur frequently (unsuccessful handshakes or DNS lookups)</br>
 
 The BOT's token, used for _login_ to the WebSocket, should reside in a file called `.env` with the following syntax:
 ```
@@ -37,17 +41,18 @@ Commands registered _by default_ are:
 - `/r` to __play__ a __random__ audio source
 - `/p` to __play__ an audio source
 
-The `/p` command's syntax is `/p ogg:audioSource.ogg`, meaning it only accepts an argument called `ogg`, it being the audio source to be played. An autocompletion utility is provided to facilitate user input.</br>
-`/r` is a particular fun way to play audio in the voice channel as it does not have an autocomplete function: secret audio sources not accessible directly with `/p` can be played this way.</br></br>
+The `/p` command's syntax is `/p ogg:audioSource.ogg`, meaning it only accepts an argument called `ogg`, it being the _audio source to be played_. An autocompletion utility is provided to facilitate user input.</br>
+
+`/r` is a particular _fun_ way to play audio in the voice channel as it does not have an autocomplete function: secret audio sources not accessible directly with `/p` can be played this way.</br></br>
 Some __error handling__ is present.</br>
 You can change the messages to be printed if your command fails, e.g.:
-- `notInVoice = "`🚫`: not in a voice channel"`  the user issuing the command is not connected to a voice channel
-- `notFound = "`🚫`: not an audio source"` if the `ogg` argument is invalid
+- `notInVoice = "🚫: not in a voice channel"`
+- `notFound = "🚫: not an audio source"`
 - ...
 
 __Logging__ is also present:</br>
-- the `Timer()` class will allow you to time events by simply calling `myTempo.start()` to start the timing and `myTempo.stop()` to stop it, printing to console the elapsed time
-- `printInColor(arg1,arg2)` will allow you to print colored text to tag important events during code execution
+- the `Timer()` class will allow you to _time events_ by simply calling `myTempo.start()` to start the timing and `myTempo.stop()` to stop it, printing to console the elapsed time
+- `printInColor(arg1,arg2)` will allow you to _print colored text_ to tag important events during code execution
 
 ## Dependencies (Linux)
 Dependencies are defined in the [Pipfile](/Pipfile).</br>
