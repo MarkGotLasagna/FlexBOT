@@ -20,7 +20,7 @@
 ## How it works
 FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
 The directory to be used is specified in the brains of the bot [main.py](/main.py) (`myDirectory`). </br></br>
-_Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefore weight (same format WhatsApp uses for voice messages).</br>
+_Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefore size.</br>
 > keep in mind that changing the audio format may change performances considerably and HTTP errors may occur frequently (unsuccessful handshakes or DNS lookups)</br>
 
 The BOT's token, used for _login_ to the WebSocket, should reside in a file called `.env` with the following syntax:
@@ -36,11 +36,15 @@ Commands registered _by default_ are:
 - `/j` to __join__ the same voice channel the user is connected to
 - `/l` to __leave__ the voice channel
 - `/r` to __play__ a __random__ audio source
-- `/p` to __play__ an audio source
+- `/p` to __join__ and __play__ an audio source
+- `/s` to __skip__ the playing audio source
 
-The `/p` command's syntax is `/p ogg:audioSource.ogg`, meaning it only accepts an argument called `ogg`, it being the _audio source to be played_. An autocompletion utility is provided to facilitate user input.</br>
+The `/p` command's syntax is `/p ogg audioSource.ogg`, meaning it only accepts an argument called `ogg`, it being the _audio source to be played_. An autocompletion utility is provided to facilitate user input.</br>
 
-`/r` is a particular _fun_ way to play audio in the voice channel as it does not have an autocomplete function: secret audio sources not accessible directly with `/p` can be played this way.</br></br>
+`/r` is a particular _fun_ way to play audio in the voice channel as it does not have an autocomplete function.
+
+Both `/r` and `/p` will instantiate `/j` first, if necessary.
+
 Some __error handling__ is present.</br>
 You can change the messages to be printed if your command fails, e.g.:
 - `notInVoice = "🚫: not in a voice channel"`

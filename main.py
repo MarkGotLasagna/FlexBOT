@@ -1,5 +1,4 @@
-"""
-    a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna
+""" a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna
 
     The code is designed to be as modular as possible, changes can be applied to:
     - the bot's name (myBotName)
@@ -10,6 +9,7 @@
 """
 
 """ MUST HAVE DEPENDENCIES (Linux)
+
     python3 -m pip install -U py-cord[speed] \ 
         py-cord[voice] \
         aiohttp[speedups] \
@@ -55,11 +55,13 @@ myTempo = Timer()                                                               
 
 myBotName = "FlexBOT 💽"
 myDirectory = "./audio/"
-my_options = os.listdir(myDirectory)
+myOptions = sorted(os.listdir(myDirectory))
 notInVoice = "`🚫`: not in a voice channel"
 notFound = "`🚫`: not an audio source"
+notPlaying = "`🚫`: no audio source is playing"
 isConnected = "`✅`: voice connected"
 isDisconnected = "`✅`: leaving voice"
+isSkipped = "`✅`: skipping audio source"
 isInVoice = "`⚠️`: already connected"
 isStillPlaying = "`⚠️`: still playing"
 isPlaying = "`⏯️`: playing"
@@ -122,7 +124,7 @@ class myView(discord.ui.View):
         emoji = "💿"
     )
     async def button_sources(self, button, interaction):
-        await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`,\n\nthe following `audio sources` are available:\n\n {my_options}", ephemeral = True)
+        await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`,\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
 
 ######################################################################################################################## STARTUP
 # changes to Discord's API dictate that only a single request per guild may be sent
@@ -140,7 +142,7 @@ async def on_ready():
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
 # (/d) for debugging, (/j) to join voice, (/l) to leave voice, 
-# (/r) to play a random audio,(/p) to play 
+# (/r) to play a random audio,(/p) to play, (/s) to skip
 try:
     @myClient.slash_command(
         name="d", 
@@ -185,11 +187,11 @@ try:
         pass_context = True)
     async def r(ctx):
         if ctx.guild.voice_client is None:
-            return await ctx.respond(notInVoice, ephemeral = True)
-        else: voice = ctx.guild.voice_client
+            await j(ctx)
+        voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
             return await ctx.respond(isStillPlaying, ephemeral = True)
-        my_random = random.choice(my_options)
+        my_random = random.choice(myOptions)
         my_random = myDirectory + my_random
         source = FFmpegPCMAudio(my_random)
         player = voice.play(source)
@@ -197,7 +199,7 @@ try:
 
     @staticmethod
     def sourceAutocomplete(ctx: discord.AutocompleteContext):
-        return [ sourceFile for sourceFile in my_options if sourceFile.startswith(ctx.value.lower()) ]
+        return [ sourceFile for sourceFile in myOptions if sourceFile.__contains__(ctx.value.lower()) ]
 
     @myClient.slash_command(
         name = "p",
@@ -207,37 +209,52 @@ try:
     @option("ogg", description = "The audio source to be played", autocomplete = sourceAutocomplete)
     async def audio(ctx, ogg: str):
         if ctx.guild.voice_client is None:
-            return await ctx.respond(notInVoice, ephemeral = True)
-        else: voice = ctx.guild.voice_client
+            await j(ctx)
+        voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
             return await ctx.respond(isStillPlaying, ephemeral = True)
         source = FFmpegPCMAudio(myDirectory + ogg)
-        if (ogg) not in my_options:
+        if (ogg) not in myOptions:
             return await ctx.respond(notFound, ephemeral = True)
         player = voice.play(source)
         await ctx.respond(isPlaying, ephemeral = True)
+    
+    @myClient.slash_command(
+        name = "s",
+        description = "Skip the playing audio source",
+        guilds_ids = myGuilds,
+        pass_context = True)
+    async def s(ctx):
+        if ctx.guild.voice_client is None:
+            return await ctx.respond(notInVoice, ephemeral = True)
+        else: voice = ctx.guild.voice_client
+        if ctx.guild.voice_client.is_playing():
+            player = voice.stop()
+            return await ctx.respond(isSkipped, ephemeral = True)
+        else:
+            return await ctx.respond(notPlaying, ephemeral = True)
 except:
     print(f"{Back.RED} Something went wrong during a command invocation {Style.RESET_ALL}")
 
-######################################################################################################################## SLASH COMMANDS
-# originally, 'N' number of commands were registered for 'x' number of audio sources present in the directory
-# although intuitive, doing so caused drawbacks, the biggest being latency and slowdowns
+############################################################################################################### SLASH COMMANDS
+# originally, 'N' number of commands were registered for 'x' number of audio sources present in the directory #
+# although intuitive, doing so caused drawbacks, the biggest being latency and slowdowns                      #
+# @p.command(                                                                                                 #
+#     name = "yourname",                                                                                      #
+#     description = "yourdescription",                                                                        #
+#     guilds_ids = myGuilds,                                                                                  #
+#     pass_context = True                                                                                     #
+# )                                                                                                           #
+# async def your_command_name(ctx):                                                                           #
+#     if ctx.guild.voice_client is None:                                                                      #
+#         return await ctx.respond(not_in, ephemeral = True)                                                  #
+#     else: voice = ctx.guild.voice_client                                                                    #
+#     source = FFmpegPCMAudio("your_resource")                                                                #
+#     player = voice.play(source)                                                                             #
+#     await ctx.respond("⏯️ now playing...", ephemeral = True)                                                #
+###############################################################################################################
 
-# @p.command(
-#     name = "yourname",
-#     description = "yourdescription",
-#     guilds_ids = myGuilds,
-#     pass_context = True
-# )
-# async def your_command_name(ctx):
-#     if ctx.guild.voice_client is None:
-#         return await ctx.respond(not_in, ephemeral = True)
-#     else: voice = ctx.guild.voice_client
-#     source = FFmpegPCMAudio("your_resource")
-#     player = voice.play(source)
-#     await ctx.respond("⏯️ now playing...", ephemeral = True)
-
-######################################################################################################################## TOKEN
+########################################################################################################################  TOKEN
 try:
     dotenv.load_dotenv()
     token = str(os.getenv("TOKEN"))
