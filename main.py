@@ -140,7 +140,7 @@ async def on_ready():
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
 # (/d) for debugging, (/j) to join voice, (/l) to leave voice, 
-# (/r) to play a random audio, (/o) for available audio sources, (/p) to play 
+# (/r) to play a random audio,(/p) to play 
 try:
     @myClient.slash_command(
         name="d", 
