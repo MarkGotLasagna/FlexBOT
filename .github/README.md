@@ -1,11 +1,12 @@
 # FlexBOT 💽
 <div align=center>
+    <image src=/.pics/main.png width=75%></image></br>
     <image src=https://img.shields.io/github/pipenv/locked/python-version/MarkGotLasagna/FlexBOT?style=plastic><image>
     <image src=https://img.shields.io/pypi/implementation/py-cord?style=plastic><image>
     <image src=https://img.shields.io/pypi/wheel/py-cord?style=plastic><image>
     <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image></br>
     A simple Discord BOT, written in Python, for playing local audio sources into voice channels</br></br>
-    <image src=/.pics/main.png width=75%></image></br></br>
+    
 </div>
 
 ## Dir structure
