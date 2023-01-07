@@ -23,9 +23,6 @@ The BOT's token, used for _logging in_ to the WebSocket, should reside in a file
 TOKEN = yourSecretTOKEN
 ```
 ## How it works
-<div align=center>
-    <image src=./opengl-rotating-triangle.gif></image>
-</div>
 FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
 The directory to be used is declared in `myDirectory`. </br>
 Registered guilds are declared inside `myGuilds`.</br>
