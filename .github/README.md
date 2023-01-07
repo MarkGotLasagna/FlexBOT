@@ -23,6 +23,9 @@ The BOT's token, used for _logging in_ to the WebSocket, should reside in a file
 TOKEN = yourSecretTOKEN
 ```
 ## How it works
+<div align=center>
+    <image src=./opengl-rotating-triangle.gif></image>
+</div>
 FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
 The directory to be used is declared in `myDirectory`. </br>
 Registered guilds are declared inside `myGuilds`.</br>
@@ -63,24 +66,20 @@ __Logging__ is also present:</br>
     <image src=/.pics/handling_error.png width=75%>
 </div>
 
-## Dependencies (Linux)
+## Dependencies
 Dependencies are defined in the [Pipfile](/Pipfile).</br>
-```
-# skip this if you're going to use pipenv
 
-python3 -m pip install -U py-cord[speed] \ 
-    py-cord[voice] \
-    aiohttp[speedups] \
-    colorama \
-    python-dotenv \
-    PyNaCl \
-    ffmpeg-python
-```
 The BOT's execution was tested using _virtual environments_ automatically set up by [pipenv](https://pipenv.pypa.io/en/latest/).</br>
 
-Assuming you have it already installed, the following command will _clone_ the repository, _cd_ into it and _create_ a Python virtual environment for you.
 ```
-git clone https://github.com/MarkGotLasagna/FlexBOT && cd FlexBOT && pipenv install
+pip install --user pipenv
+```
+
+The following commands will _clone_ the repository, _cd_ into it and _create_ a Python virtual environment for you.
+```
+git clone https://github.com/MarkGotLasagna/FlexBOT && \
+    cd FlexBOT && \
+    pipenv install
 ```
 By running
 ```
