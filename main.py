@@ -28,8 +28,13 @@ from discord import FFmpegPCMAudio, option
 
 just_fix_windows_console()
 
+aOK = "(OK)"
+aINFO = f"\n      {Back.BLUE} (INFO) Probably a typo or an unnoticed syntax error {Style.RESET_ALL}"
+aERR = f"\n{Back.RED} (ERR) Something internal went wrong during invocation of "
+aFAIL = f"\n{Back.RED} (FAIL) Catastrophic failure {Style.RESET_ALL}"
+
 def printInColor(arg1, arg2):
-    print(f"{Back.LIGHTBLACK_EX} Initializing {str(arg1)} {str(arg2)} {Style.RESET_ALL}")
+    print(f"{Back.LIGHTBLACK_EX} {aOK} Initializing {str(arg1)} {str(arg2)} {Style.RESET_ALL}")
 
 ######################################################################################################### TIMING
 # to check for slowdowns in the code                                                                    #
@@ -49,7 +54,7 @@ class Timer:                                                                    
             raise TimerError(f"Timer not running")                                                      #
         elapsed_time = time.perf_counter() - self._start_time                                           #
         self._start_time = None                                                                         #
-        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")     #
+        print(f"     {Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")     #
 myTempo = Timer()                                                                                       #
 #########################################################################################################
 
@@ -65,6 +70,7 @@ isSkipped = "`✅`: skipping audio source"
 isInVoice = "`⚠️`: already connected"
 isStillPlaying = "`⚠️`: still playing"
 isPlaying = "`⏯️`: playing"
+isError = "`🚫`: some internal error happened"
 
 printInColor(myBotName, "instance")
 
@@ -135,28 +141,34 @@ async def on_ready():
         printInColor("myView()", "value")
         myClient.add_view(myView())
         myTempo.stop()
-        print(f"\n{Back.GREEN} Ready state {Style.RESET_ALL}\n")
+        print(f"\n{Back.GREEN} Ready state {Style.RESET_ALL}")
     except:
-        print(f"{Back.RED} Something went wrong during the initialization process {Style.RESET_ALL}")
+        print(f"{aERR}(on_ready())")
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
 # (/d) for debugging, (/j) to join voice, (/l) to leave voice,
 # (/r) to play a random audio,(/p) to play, (/s) to skip
-try:
-    @myClient.slash_command(
-        name="d", 
-        description="For debugging purposes", 
-        guild_ids=myGuilds, 
-        pass_context = True)
-    async def d(ctx):
-        return await ctx.respond("> Debugging utils to check the bot's availability", view = myView())
 
-    @myClient.slash_command(
-        name= "j",
-        description = "Join the voice channel",
-        guilds_ids = myGuilds,
-        pass_context = True)
-    async def j(ctx):
+@myClient.slash_command(
+    name="d", 
+    description="For debugging purposes", 
+    guild_ids=myGuilds, 
+    pass_context = True)
+async def d(ctx):
+    try:
+        return await ctx.respond("> Debugging utils to check the bot's availability", view = myView())
+    except:
+        print(f"{aERR}(/d){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
+
+@myClient.slash_command(
+    name= "j",
+    description = "Join the voice channel",
+    guilds_ids = myGuilds,
+    pass_context = True)
+async def j(ctx):
+    try:
         if(ctx.author.voice):
             channel = ctx.author.voice.channel
             try: 
@@ -166,54 +178,70 @@ try:
                 return await ctx.respond(isInVoice)
         else:
             return await ctx.respond(notInVoice)
+    except:
+        print(f"{aERR}(/j){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
 
-    @myClient.slash_command(
-        name="l", 
-        description="Leave the voice channel", 
-        guild_ids=myGuilds, 
-        pass_context = True)
-    async def l(ctx):
+@myClient.slash_command(
+    name="l", 
+    description="Leave the voice channel", 
+    guild_ids=myGuilds, 
+    pass_context = True)
+async def l(ctx):
+    try:
         if (ctx.voice_client):
             await ctx.guild.voice_client.disconnect()
             return await ctx.respond(isDisconnected)
         else:
             return await ctx.respond(notInVoice, ephemeral = True)
+    except:
+        print(f"{aERR}(/l){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
 
-    @myClient.slash_command(
-        name = "r",
-        description = "Play a random audio source",
-        guilds_ids = myGuilds,
-        pass_context = True)
-    async def r(ctx):
+@myClient.slash_command(
+    name = "r",
+    description = "Play a random audio source",
+    guilds_ids = myGuilds,
+    pass_context = True)
+async def r(ctx):
+    try:
         if ctx.guild.voice_client is None:
             await j(ctx)
-        voice = ctx.guild.voice_client
+        myVoiceConnection = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            player = voice.stop()
+            myPlayer = myVoiceConnection.stop()
             await ctx.respond(isSkipped, ephemeral = True)
-            my_random = random.choice(myOptions)
-            my_random = myDirectory + my_random
-            source = FFmpegPCMAudio(my_random)
-            player = voice.play(source)
+            myRandom = random.choice(myOptions)
+            myRandom = myDirectory + myRandom
+            mySource = FFmpegPCMAudio(myRandom)
+            myPlayer = myVoiceConnection.play(mySource)
             return await ctx.respond(isPlaying, ephemeral = True)
         else:
-            my_random = random.choice(myOptions)
-            my_random = myDirectory + my_random
-            source = FFmpegPCMAudio(my_random)
-            player = voice.play(source)
+            myRandom = random.choice(myOptions)
+            myRandom = myDirectory + myRandom
+            mySource = FFmpegPCMAudio(myRandom)
+            myPlayer = myVoiceConnection.play(mySource)
             return await ctx.respond(isPlaying, ephemeral = True)
+    except:
+        print(f"{aERR}(/r){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
 
-    @staticmethod
-    def sourceAutocomplete(ctx: discord.AutocompleteContext):
-        return [ sourceFile for sourceFile in myOptions if sourceFile.__contains__(ctx.value.lower()) ]
+@staticmethod
+def sourceAutocomplete(ctx: discord.AutocompleteContext):
+    return [ sourceFile for sourceFile in myOptions if sourceFile.__contains__(ctx.value.lower()) ]
 
-    @myClient.slash_command(
-        name = "p",
-        description = "Play audio source from the available options",
-        guilds_ids = myGuilds,
-        pass_context = True)
-    @option("ogg", description = "The audio source to be played", autocomplete = sourceAutocomplete)
-    async def audio(ctx, ogg: str):
+@myClient.slash_command(
+    name = "p",
+    description = "Play audio source from the available options",
+    guilds_ids = myGuilds,
+    pass_context = True)
+@option("ogg", description = "The audio source to be played", autocomplete = sourceAutocomplete)
+async def audio(ctx, ogg: str):
+    try:
+        aaa
         if ctx.guild.voice_client is None:
             await j(ctx)
         voice = ctx.guild.voice_client
@@ -231,13 +259,18 @@ try:
                 return await ctx.respond(notFound, ephemeral = True)
             player = voice.play(source)
             return await ctx.respond(isPlaying, ephemeral = True)
-    
-    @myClient.slash_command(
-        name = "s",
-        description = "Skip the playing audio source",
-        guilds_ids = myGuilds,
-        pass_context = True)
-    async def s(ctx):
+    except:
+        print(f"{aERR}(/p){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
+
+@myClient.slash_command(
+    name = "s",
+    description = "Skip the playing audio source",
+    guilds_ids = myGuilds,
+    pass_context = True)
+async def s(ctx):
+    try:
         if ctx.guild.voice_client is None:
             return await ctx.respond(notInVoice, ephemeral = True)
         else: voice = ctx.guild.voice_client
@@ -246,8 +279,10 @@ try:
             return await ctx.respond(isSkipped, ephemeral = True)
         else:
             return await ctx.respond(notPlaying, ephemeral = True)
-except:
-    print(f"{Back.RED} Something went wrong during a command invocation {Style.RESET_ALL}")
+    except:
+        print(f"{aERR}(/s){Style.RESET_ALL}" + 
+            f"{aINFO}\n")
+        return await ctx.respond(isError, ephemeral = True)
 
 ############################################################################################################### SLASH COMMANDS
 # originally, 'N' number of commands were registered for 'x' number of audio sources present in the directory #
@@ -273,4 +308,5 @@ try:
     token = str(os.getenv("TOKEN"))
     myClient.run(token)
 except discord.errors.LoginFailure:
-    print(f"{Back.RED} TOKEN error {Style.RESET_ALL}")
+    print(f"{aFAIL}" + 
+    f"\n       {Back.BLUE} (INFO) '.env' is the culprit {Style.RESET_ALL}\n")
