@@ -11,9 +11,10 @@
 ## Dir structure
 ```
 .
-├── audio
+├── audio   <-- where to store your audio sources
 │   └── sample_audio.ogg
-├── main.py
+├── main.py <-- the BOT's brains
+├── .env    <-- where to store the TOKEN
 └── README.md
 ```
 
