@@ -60,6 +60,10 @@ __Logging__ is also present:</br>
 - the `Timer()` class will allow you to _time events_ by simply calling `myTempo.start()` to start the timing and `myTempo.stop()` to stop it, printing to console the elapsed time
 - `printInColor(arg1,arg2)` will allow you to _print colored text_ to tag important events during code execution
 
+<div align=center>
+    <image src=/.pics/handling_error.png width=75%>
+</div>
+
 ## Dependencies (Linux)
 Dependencies are defined in the [Pipfile](/Pipfile).</br>
 ```
