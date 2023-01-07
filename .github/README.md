@@ -5,8 +5,7 @@
     <image src=https://img.shields.io/pypi/implementation/py-cord?style=plastic><image>
     <image src=https://img.shields.io/pypi/wheel/py-cord?style=plastic><image>
     <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image></br>
-    A simple Discord BOT, written in Python, for playing local audio sources into voice channels</br></br>
-    
+    A simple Discord BOT, written in Python, for playing local audio sources into voice channels
 </div>
 
 ## Dir structure
@@ -23,7 +22,6 @@ The BOT's token, used for _logging in_ to the WebSocket, should reside in a file
 ```
 TOKEN = yourSecretTOKEN
 ```
-
 ## How it works
 FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
 The directory to be used is declared in `myDirectory`. </br>
