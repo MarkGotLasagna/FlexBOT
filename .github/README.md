@@ -5,7 +5,7 @@
     <image src=https://img.shields.io/pypi/wheel/py-cord?style=plastic><image>
     <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image></br>
     A simple Discord BOT, written in Python, for playing local audio sources into voice channels</br></br>
-    <image src=/pics/main.png width=75%></image></br></br>
+    <image src=/.pics/main.png width=75%></image></br></br>
 </div>
 
 ## Dir structure
@@ -18,22 +18,20 @@
 └── README.md
 ```
 
-## How it works
-FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
-The directory to be used is specified in the brains of the bot [main.py](/main.py) (`myDirectory`). </br></br>
-_Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefore size.</br>
-> keep in mind that changing the audio format may change performances considerably and HTTP errors may occur frequently (unsuccessful handshakes or DNS lookups)</br>
-
-The BOT's token, used for _login_ to the WebSocket, should reside in a file called `.env` with the following syntax:
+The BOT's token, used for _logging in_ to the WebSocket, should reside in a file called `.env` with the following syntax:
 ```
 TOKEN = yourSecretTOKEN
 ```
 
+## How it works
+FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
+The directory to be used is declared in `myDirectory`. </br>
 Registered guilds are declared inside `myGuilds`.</br>
-You must add your guild's IDs to activate the commands.
-```
-myGuilds = [ guildId1, guildId2 ]
-```
+
+_Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefore size.</br>
+> keep in mind that changing the audio format may change performances considerably and HTTP errors may occur frequently (unsuccessful handshakes or DNS lookups)</br>
+
+
 ### Commands
 Commands registered _by default_ are:
 - `/d` for __debugging purposes__, namely
