@@ -34,7 +34,7 @@ _Audio sources_ are to be intended as __audio files__ in `.ogg` format, since th
 ### Commands
 Commands registered _by default_ are:
 - `/d` for __debugging purposes__, namely
-    - _pinging_ the WebSocket to check latency (🏓 Ping)
+    - _ping_ the WebSocket to check latency (🏓 Ping)
     - _get info_ about the BOT's properties (❓ Info)
     - get _available_ audio sources (💿 Sources)
 - `/j` to __join__ the voice channel
