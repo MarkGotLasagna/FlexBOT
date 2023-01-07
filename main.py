@@ -22,7 +22,7 @@
 
 ######################################################################################################################## IMPORTS AND VARIABLES
 import discord, os, random, time, dotenv
-from colorama import just_fix_windows_console, Fore, Back, Style
+from colorama import just_fix_windows_console, Back, Style
 from discord.ext import commands
 from discord import FFmpegPCMAudio, option
 
@@ -54,7 +54,7 @@ myTempo = Timer()                                                               
 #########################################################################################################
 
 myBotName = "FlexBOT 💽"
-myDirectory = "./audio/"
+myDirectory = "./audio/" # must be in the same directory as 'main.py'
 myOptions = sorted(os.listdir(myDirectory))
 notInVoice = "`🚫`: not in a voice channel"
 notFound = "`🚫`: not an audio source"
@@ -84,8 +84,8 @@ printInColor("discord.Intents()", "value")
 myClient = commands.Bot(intents = myIntents)
 
 printInColor("myGuilds", "value")
-myGuilds = [288411793292787714, # fic
-            379041606449364993]  # Flex Community
+myGuilds = [288411793292787714,     # fic
+            379041606449364993]     # Flex Community
 
 # printInColor("p", "group")
 # p = myClient.create_group("p", "Play some audio file")
@@ -103,7 +103,7 @@ class myView(discord.ui.View):
         emoji = "🏓"
     )
     async def button_ping(self, button, interaction):
-        await interaction.response.send_message(f"🏓 Pong!\n\n `WebSocket latency : {myClient.latency}`", ephemeral = True)
+        return await interaction.response.send_message(f"🏓 Pong!\n\n `WebSocket latency : {myClient.latency}`", ephemeral = True)
 
     @discord.ui.button(
         label = "Info",
@@ -112,7 +112,7 @@ class myView(discord.ui.View):
         emoji = "❓"
     )
     async def button_voice_clients(self, button, interaction):
-        await interaction.response.send_message(f"`Voice clients : {myClient.voice_clients}`\n\n" + 
+        return await interaction.response.send_message(f"`Voice clients : {myClient.voice_clients}`\n\n" + 
         f"`Owner : MarkGotLasagna#6113`\n\n" + 
         f"`Guilds : {myClient.guilds}`\n\n" + 
         f"`Intents : {myClient.intents}`\n\n", ephemeral = True)
@@ -124,7 +124,7 @@ class myView(discord.ui.View):
         emoji = "💿"
     )
     async def button_sources(self, button, interaction):
-        await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`,\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
+        return await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`,\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
 
 ######################################################################################################################## STARTUP
 # changes to Discord's API dictate that only a single request per guild may be sent
@@ -134,14 +134,13 @@ async def on_ready():
     try:
         printInColor("myView()", "value")
         myClient.add_view(myView())
-
         myTempo.stop()
         print(f"\n{Back.GREEN} Ready state {Style.RESET_ALL}\n")
     except:
         print(f"{Back.RED} Something went wrong during the initialization process {Style.RESET_ALL}")
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
-# (/d) for debugging, (/j) to join voice, (/l) to leave voice, 
+# (/d) for debugging, (/j) to join voice, (/l) to leave voice,
 # (/r) to play a random audio,(/p) to play, (/s) to skip
 try:
     @myClient.slash_command(
@@ -150,7 +149,7 @@ try:
         guild_ids=myGuilds, 
         pass_context = True)
     async def d(ctx):
-        await ctx.respond("> Debugging utils to check the bot's availability", view = myView())
+        return await ctx.respond("> Debugging utils to check the bot's availability", view = myView())
 
     @myClient.slash_command(
         name= "j",
@@ -162,11 +161,11 @@ try:
             channel = ctx.author.voice.channel
             try: 
                 voice = await channel.connect()
-                await ctx.respond(isConnected)
+                return await ctx.respond(isConnected)
             except discord.errors.ClientException:
-                await ctx.respond(isInVoice)
+                return await ctx.respond(isInVoice)
         else:
-            await ctx.respond(notInVoice)
+            return await ctx.respond(notInVoice)
 
     @myClient.slash_command(
         name="l", 
@@ -175,10 +174,10 @@ try:
         pass_context = True)
     async def l(ctx):
         if (ctx.voice_client):
-            await ctx.respond(isDisconnected)
             await ctx.guild.voice_client.disconnect()
+            return await ctx.respond(isDisconnected)
         else:
-            await ctx.respond(notInVoice, ephemeral = True)
+            return await ctx.respond(notInVoice, ephemeral = True)
 
     @myClient.slash_command(
         name = "r",
@@ -190,12 +189,19 @@ try:
             await j(ctx)
         voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            return await ctx.respond(isStillPlaying, ephemeral = True)
-        my_random = random.choice(myOptions)
-        my_random = myDirectory + my_random
-        source = FFmpegPCMAudio(my_random)
-        player = voice.play(source)
-        await ctx.respond(isPlaying, ephemeral = True)
+            player = voice.stop()
+            await ctx.respond(isSkipped, ephemeral = True)
+            my_random = random.choice(myOptions)
+            my_random = myDirectory + my_random
+            source = FFmpegPCMAudio(my_random)
+            player = voice.play(source)
+            return await ctx.respond(isPlaying, ephemeral = True)
+        else:
+            my_random = random.choice(myOptions)
+            my_random = myDirectory + my_random
+            source = FFmpegPCMAudio(my_random)
+            player = voice.play(source)
+            return await ctx.respond(isPlaying, ephemeral = True)
 
     @staticmethod
     def sourceAutocomplete(ctx: discord.AutocompleteContext):
@@ -218,14 +224,13 @@ try:
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
             player = voice.play(source)
-            await ctx.respond(isPlaying, ephemeral = True)
-            # return await ctx.respond(isStillPlaying, ephemeral = True)
+            return await ctx.respond(isPlaying, ephemeral = True)
         else:
             source = FFmpegPCMAudio(myDirectory + ogg)
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
             player = voice.play(source)
-            await ctx.respond(isPlaying, ephemeral = True)
+            return await ctx.respond(isPlaying, ephemeral = True)
     
     @myClient.slash_command(
         name = "s",
