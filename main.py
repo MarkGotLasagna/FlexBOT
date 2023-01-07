@@ -241,7 +241,6 @@ def sourceAutocomplete(ctx: discord.AutocompleteContext):
 @option("ogg", description = "The audio source to be played", autocomplete = sourceAutocomplete)
 async def audio(ctx, ogg: str):
     try:
-        aaa
         if ctx.guild.voice_client is None:
             await j(ctx)
         voice = ctx.guild.voice_client
