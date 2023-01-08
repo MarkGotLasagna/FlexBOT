@@ -64,6 +64,8 @@ __Logging__ is also present:</br>
 </div>
 
 ## Dependencies
+For a detailed guide for most used operating systems (Windows, MacOS and Linux), visit the [Wiki](https://github.com/MarkGotLasagna/FlexBOT/wiki)!
+
 Dependencies are defined in the [Pipfile](/Pipfile).</br>
 
 The BOT's execution was tested using _virtual environments_ automatically set up by [pipenv](https://pipenv.pypa.io/en/latest/).</br>
