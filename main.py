@@ -7,25 +7,16 @@
     - prints of timings (myTempo.start(), myTempo.stop());
     - the directory from where extracting audio sources (myDirectory).
 """
-
-""" MUST HAVE DEPENDENCIES (Linux)
-
-    python3 -m pip install -U py-cord[speed] \ 
-        py-cord[voice] \
-        aiohttp[speedups] \
-        colorama \
-        python-dotenv \
-        PyNaCl \
-        ffmpeg-python
-    sudo apt-get install ffmpeg libffi-dev libnacl-dev python3-dev
-"""
-
 ######################################################################################################################## IMPORTS AND VARIABLES
+# 'discord' as in the API, 'os' & 'random' to generate audio sources, 'time' to debug, 'dotenv' to import the TOKEN    #
+# 'colorama' for coloring text in the terminal, 'ffmpeg' for encoding audio                                            #
+########################################################################################################################
 import discord, os, random, time, dotenv
 from colorama import just_fix_windows_console, Back, Style
 from discord.ext import commands
 from discord import FFmpegPCMAudio, option
 
+# will fix Windows command prompt colors
 just_fix_windows_console()
 
 aOK = "(OK)"
@@ -33,32 +24,34 @@ aINFO = f"\n      {Back.BLUE} (INFO) Probably a typo or an unnoticed syntax erro
 aERR = f"\n{Back.RED} (ERR) Something internal went wrong during invocation of "
 aFAIL = f"\n{Back.RED} (FAIL) Catastrophic failure {Style.RESET_ALL}"
 
+# for debugging, use this to print messages to terminal
 def printInColor(arg1, arg2):
     print(f"{Back.LIGHTBLACK_EX} {aOK} Initializing {str(arg1)} {str(arg2)} {Style.RESET_ALL}")
 
-######################################################################################################### TIMING
-# to check for slowdowns in the code                                                                    #
-# myTempo.start() to start the timer                                                                    #
-# myTempo.stop() to stop the timer and print the time                                                   #
-class TimerError(Exception):                                                                            #
-    """ Error handling """                                                                              #
-class Timer:                                                                                            #
-    def __init__(self):                                                                                 #
-        self._start_time = None                                                                         #
-    def start(self):                                                                                    #
-        if self._start_time is not None:                                                                #
-            raise TimerError(f"Timer started")                                                          #
-        self._start_time = time.perf_counter()                                                          #
-    def stop(self):                                                                                     #
-        if self._start_time is None:                                                                    #
-            raise TimerError(f"Timer not running")                                                      #
-        elapsed_time = time.perf_counter() - self._start_time                                           #
-        self._start_time = None                                                                         #
-        print(f"     {Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")     #
-myTempo = Timer()                                                                                       #
-#########################################################################################################
+############################################################################################################# TIMING
+# to check for slowdowns in the code                                                                        #
+# myTempo.start() to start the timer                                                                        #
+# myTempo.stop() to stop the timer and print the time                                                       #
+#############################################################################################################
+class TimerError(Exception):                                                                                #
+    """ Error handling """                                                                                  #
+class Timer:                                                                                                #
+    def __init__(self):                                                                                     #
+        self._start_time = None                                                                             #
+    def start(self):                                                                                        #
+        if self._start_time is not None:                                                                    #
+            raise TimerError(f"Timer started")                                                              #
+        self._start_time = time.perf_counter()                                                              #
+    def stop(self):                                                                                         #
+        if self._start_time is None:                                                                        #
+            raise TimerError(f"Timer not running")                                                          #
+        elapsed_time = time.perf_counter() - self._start_time                                               #
+        self._start_time = None                                                                             #
+        print(f"     {Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")    #
+myTempo = Timer()                                                                                           #
+#############################################################################################################
 
-myBotName = "FlexBOT 💽"
+myBotName = "FlexBOT 💽" # change it to your liking
 myDirectory = "./audio/" # must be in the same directory as 'main.py'
 myOptions = sorted(os.listdir(myDirectory))
 notInVoice = "`🚫`: not in a voice channel"
@@ -90,6 +83,7 @@ printInColor("discord.Intents()", "value")
 myClient = commands.Bot(intents = myIntents)
 
 printInColor("myGuilds", "value")
+# you must change this if you want your server to register the commands
 myGuilds = [288411793292787714,     # fic
             379041606449364993]     # Flex Community
 
@@ -97,7 +91,8 @@ myGuilds = [288411793292787714,     # fic
 # p = myClient.create_group("p", "Play some audio file")
 
 ######################################################################################################################## BUTTONS
-# when executing the slash command (/d), a set of buttons for debugging purposes is presented
+# when executing the slash command (/d), a set of buttons for debugging purposes is presented                          #
+########################################################################################################################
 class myView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout = None)
@@ -130,11 +125,13 @@ class myView(discord.ui.View):
         emoji = "💿"
     )
     async def button_sources(self, button, interaction):
-        return await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`,\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
+        return await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`," + 
+            f"\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
 
 ######################################################################################################################## STARTUP
-# changes to Discord's API dictate that only a single request per guild may be sent
-# a considerable slowdown to the startup is expected in case the bot is registered to large guilds (#members > 250)
+# changes to Discord's API dictate that only a single request per guild may be sent                                    #
+# a considerable slowdown to the startup is expected in case the bot is registered to large guilds (#members > 250)    #
+########################################################################################################################
 @myClient.event
 async def on_ready():
     try:
@@ -146,9 +143,9 @@ async def on_ready():
         print(f"{aERR}(on_ready())")
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
-# (/d) for debugging, (/j) to join voice, (/l) to leave voice,
-# (/r) to play a random audio,(/p) to play, (/s) to skip
-
+# (/d) for debugging, (/j) to join voice, (/l) to leave voice,                                                         #
+# (/r) to play a random audio,(/p) to play, (/s) to skip                                                               #
+########################################################################################################################
 @myClient.slash_command(
     name="d", 
     description="For debugging purposes", 
@@ -229,6 +226,7 @@ async def r(ctx):
             f"{aINFO}\n")
         return await ctx.respond(isError, ephemeral = True)
 
+# redraws the list with words containing typed characters
 @staticmethod
 def sourceAutocomplete(ctx: discord.AutocompleteContext):
     return [ sourceFile for sourceFile in myOptions if sourceFile.__contains__(ctx.value.lower()) ]
@@ -301,7 +299,10 @@ async def s(ctx):
 #     await ctx.respond("⏯️ now playing...", ephemeral = True)                                                #
 ###############################################################################################################
 
-########################################################################################################################  TOKEN
+######################################################################################################################## TOKEN
+# you must create a separate file, in the same path as 'main.py', called '.env'                                        #
+# inside this file, you must define your token like this (TOKEN = yourSecretTOKEN)                                     #
+########################################################################################################################
 try:
     dotenv.load_dotenv()
     token = str(os.getenv("TOKEN"))
