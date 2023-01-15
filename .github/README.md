@@ -34,7 +34,7 @@ _Audio sources_ are to be intended as __audio files__ in `.ogg` format, since th
 ### Commands
 
 <div align=center>
-    <image src=/.pics/commands.png width=75%>
+    <image src=/.pics/commands.png width=25%>
 </div>
 
 Commands registered _by default_ are:
