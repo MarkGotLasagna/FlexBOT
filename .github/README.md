@@ -5,7 +5,7 @@
     <image src=https://img.shields.io/pypi/implementation/py-cord?style=plastic><image>
     <image src=https://img.shields.io/pypi/wheel/py-cord?style=plastic><image>
     <image src=https://img.shields.io/github/license/MarkGotLasagna/FlexBOT?style=plastic></image></br>
-    A simple Discord BOT, written in Python, for playing local audio sources into voice channels
+    A simple Discord BOT, written in Python, to play local audio sources into voice channels
 </div>
 
 ## Dir structure
@@ -32,11 +32,16 @@ _Audio sources_ are to be intended as __audio files__ in `.ogg` format, since th
 
 
 ### Commands
+
+<div align=center>
+    <image src=/.pics/commands.png width=75%>
+</div>
+
 Commands registered _by default_ are:
 - `/d` for __debugging purposes__, namely
-    - _ping_ the WebSocket to check latency (🏓 Ping)
-    - _get info_ about the BOT's properties (❓ Info)
-    - get _available_ audio sources (💿 Sources)
+    - _pinging_ the WebSocket to check latency (🏓 Ping)
+    - _getting info_ about the BOT's properties (❓ Info)
+    - _getting available_ audio sources (💿 Sources)
 - `/j` to __join__ the voice channel
 - `/l` to __leave__ the voice channel
 - `/r` to __randomly__ play an audio source
