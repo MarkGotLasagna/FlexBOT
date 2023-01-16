@@ -1,12 +1,5 @@
-""" a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna
+""" a SIMPLE DISCORD BOT for STREAMING AUDIO TRACKS in a VOICE CHANNEL by MarkGotLasagna """
 
-    The code is designed to be as modular as possible, changes can be applied to:
-    - the bot's name (myBotName)
-    - messages to be printed (notInVoice, isConnected, ...)
-    - log messages (debugOK())
-    - prints of timings (myTempo.start(), myTempo.stop());
-    - the directory from where extracting audio sources (myDirectory).
-"""
 ######################################################################################################################## IMPORTS AND VARIABLES
 # 'discord' as in the API, 'os' & 'random' to generate audio sources, 'time' to debug, 'dotenv' to import the TOKEN    #
 # 'colorama' for coloring text in the terminal, 'ffmpeg' for encoding audio                                            #
@@ -20,7 +13,7 @@ from discord import FFmpegPCMAudio, option
 just_fix_windows_console()
 
 ######################################################################################################################## DEBUGGING
-# use this functions to print to terminal, useful info                                                                 #
+# use this functions to print to terminal useful info                                                                  #
 ########################################################################################################################
 def debugOK(arg1, arg2):                                                                                               #                                                                                               
     OK = ' (OK) '                                                                                                      #
@@ -310,7 +303,7 @@ async def s(ctx):
 #         return await ctx.respond(not_in, ephemeral = True)                                                  #
 #     else: voice = ctx.guild.voice_client                                                                    #
 #     source = FFmpegPCMAudio("your_resource")                                                                #
-#     voice.play(source)                                                                             #
+#     voice.play(source)                                                                                      #
 #     await ctx.respond("⏯️ now playing...", ephemeral = True)                                                #
 ###############################################################################################################
 
