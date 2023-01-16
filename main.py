@@ -3,7 +3,7 @@
     The code is designed to be as modular as possible, changes can be applied to:
     - the bot's name (myBotName)
     - messages to be printed (notInVoice, isConnected, ...)
-    - log messages (printInColor())
+    - log messages (debugOK())
     - prints of timings (myTempo.start(), myTempo.stop());
     - the directory from where extracting audio sources (myDirectory).
 """
@@ -19,14 +19,22 @@ from discord import FFmpegPCMAudio, option
 # will fix Windows command prompt colors
 just_fix_windows_console()
 
-aOK = "(OK)"
-aINFO = f"\n      {Back.BLUE} (INFO) Probably a typo or an unnoticed syntax error {Style.RESET_ALL}"
-aERR = f"\n{Back.RED} (ERR) Something internal went wrong during invocation of "
-aFAIL = f"\n{Back.RED} (FAIL) Catastrophic failure {Style.RESET_ALL}"
-
 # for debugging, use this to print messages to terminal
-def printInColor(arg1, arg2):
-    print(f"{Back.LIGHTBLACK_EX} {aOK} Initializing {str(arg1)} {str(arg2)} {Style.RESET_ALL}")
+def debugOK(arg1, arg2):
+    OK = ' (OK) '
+    print(f"{Back.LIGHTBLACK_EX}{OK}{str(arg1)} {str(arg2)} {Style.RESET_ALL}")
+
+def debugINFO(arg1):
+    INFO = ' (INFO) '
+    print(f"{Back.BLUE}{INFO}{arg1} {Style.RESET_ALL}")
+
+def debugERROR(arg1):
+    ERROR = ' (ERROR) '
+    print(f"{Back.RED}{ERROR}{arg1} {Style.RESET_ALL}")
+
+def debugFAIL(arg1):
+    FAIL = ' (FAIL) '
+    print(f"{Back.RED}{FAIL}{arg1} {Style.RESET_ALL}")
 
 ############################################################################################################# TIMING
 # to check for slowdowns in the code                                                                        #
@@ -47,13 +55,22 @@ class Timer:                                                                    
             raise TimerError(f"Timer not running")                                                          #
         elapsed_time = time.perf_counter() - self._start_time                                               #
         self._start_time = None                                                                             #
-        print(f"     {Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")    #
+        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")    #
 myTempo = Timer()                                                                                           #
 #############################################################################################################
 
+myTempo.start()
+
 myBotName = "FlexBOT 💽" # change it to your liking
-myDirectory = "./audio/" # must be in the same directory as 'main.py'
-myOptions = sorted(os.listdir(myDirectory))
+myDirectory = "/home/maruko/Documents/program-files/FlexBOT/audio/" # needs a trailing "/"
+
+try:
+    myOptions = sorted(os.listdir(myDirectory))
+    debugOK('myOptions', 'value')
+except FileNotFoundError:
+    debugERROR('An error occurred when loading `myOptions`')
+    debugINFO('Is the specified path correct?')
+
 notInVoice = "`🚫`: not in a voice channel"
 notFound = "`🚫`: not an audio source"
 notPlaying = "`🚫`: no audio source is playing"
@@ -65,68 +82,74 @@ isStillPlaying = "`⚠️`: still playing"
 isPlaying = "`⏯️`: playing"
 isError = "`🚫`: some internal error happened"
 
-printInColor(myBotName, "instance")
-
-myTempo.start()
 # myIntents = discord.Intents.default()
-myIntents = discord.Intents(
-    messages = True,
-    message_content = True,
-    guilds = True,
-    members = True,
-    voice_states = True,
-    presences = True,
-    guild_messages = True
-)
+try:
+    myIntents = discord.Intents(
+        messages = True,
+        message_content = True,
+        guilds = True,
+        members = True,
+        voice_states = True,
+        presences = True,
+        guild_messages = True
+    )
+    myClient = commands.Bot(intents = myIntents)
+    debugOK("discord.Intents()", "value")
+except:
+    debugERROR('`myIntents` did not load as intended')
 
-printInColor("discord.Intents()", "value")
-myClient = commands.Bot(intents = myIntents)
-
-printInColor("myGuilds", "value")
 # you must change this if you want your server to register the commands
-myGuilds = [288411793292787714,     # fic
-            379041606449364993]     # Flex Community
+try:
+    myGuilds = [288411793292787714,     # fic
+                379041606449364993]     # Flex Community
+    debugOK("myGuilds", "value")
+except:
+    debugERROR('`myGuilds` did not load as intended')
 
-# printInColor("p", "group")
 # p = myClient.create_group("p", "Play some audio file")
 
 ######################################################################################################################## BUTTONS
 # when executing the slash command (/d), a set of buttons for debugging purposes is presented                          #
 ########################################################################################################################
-class myView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout = None)
-    
-    @discord.ui.button(
-        label = "Ping",
-        custom_id= "ping",
-        style = discord.ButtonStyle.grey, 
-        emoji = "🏓"
-    )
-    async def button_ping(self, button, interaction):
-        return await interaction.response.send_message(f"🏓 Pong!\n\n `WebSocket latency : {myClient.latency}`", ephemeral = True)
+try:
+    class myView(discord.ui.View):
+        def __init__(self):
+            super().__init__(timeout = None)
+        
+        @discord.ui.button(
+            label = "Ping",
+            custom_id= "ping",
+            style = discord.ButtonStyle.grey, 
+            emoji = "🏓"
+        )
+        async def button_ping(self, button, interaction):
+            return await interaction.response.send_message(f"🏓 Pong!\n\n `WebSocket latency : {myClient.latency}`", ephemeral = True)
 
-    @discord.ui.button(
-        label = "Info",
-        custom_id = "info",
-        style = discord.ButtonStyle.grey, 
-        emoji = "❓"
-    )
-    async def button_voice_clients(self, button, interaction):
-        return await interaction.response.send_message(f"`Voice clients : {myClient.voice_clients}`\n\n" + 
-        f"`Owner : MarkGotLasagna#6113`\n\n" + 
-        f"`Guilds : {myClient.guilds}`\n\n" + 
-        f"`Intents : {myClient.intents}`\n\n", ephemeral = True)
+        @discord.ui.button(
+            label = "Info",
+            custom_id = "info",
+            style = discord.ButtonStyle.grey, 
+            emoji = "❓"
+        )
+        async def button_voice_clients(self, button, interaction):
+            return await interaction.response.send_message(f"`Voice clients : {myClient.voice_clients}`\n\n" + 
+            f"`Owner : MarkGotLasagna#6113`\n\n" + 
+            f"`Guilds : {myClient.guilds}`\n\n" + 
+            f"`Intents : {myClient.intents}`\n\n", ephemeral = True)
 
-    @discord.ui.button(
-        label = "Sources",
-        custom_id = "sources",
-        style = discord.ButtonStyle.grey,
-        emoji = "💿"
-    )
-    async def button_sources(self, button, interaction):
-        return await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`," + 
-            f"\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
+        @discord.ui.button(
+            label = "Sources",
+            custom_id = "sources",
+            style = discord.ButtonStyle.grey,
+            emoji = "💿"
+        )
+        async def button_sources(self, button, interaction):
+            return await interaction.response.send_message(f"With standard syntax `/p ogg audioSource.ogg`," + 
+                f"\n\nthe following `audio sources` are available:\n\n {myOptions}", ephemeral = True)
+
+        debugOK("myView()", "value")
+except:
+    debugERROR('`myView` did not load as intended')
 
 ######################################################################################################################## STARTUP
 # changes to Discord's API dictate that only a single request per guild may be sent                                    #
@@ -135,12 +158,12 @@ class myView(discord.ui.View):
 @myClient.event
 async def on_ready():
     try:
-        printInColor("myView()", "value")
         myClient.add_view(myView())
         myTempo.stop()
         print(f"\n{Back.GREEN} Ready state {Style.RESET_ALL}")
     except:
-        print(f"{aERR}(on_ready())")
+        debugFAIL('A failure occurred when trying to start the bot')
+        debugINFO('Probably just a typo in the source code')
 
 ######################################################################################################################## DEFAULT SLASH COMMANDS
 # (/d) for debugging, (/j) to join voice, (/l) to leave voice,                                                         #
@@ -155,8 +178,7 @@ async def d(ctx):
     try:
         return await ctx.respond("> Debugging utils to check the bot's availability", view = myView())
     except:
-        print(f"{aERR}(/d){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (\d)')
         return await ctx.respond(isError, ephemeral = True)
 
 @myClient.slash_command(
@@ -176,8 +198,7 @@ async def j(ctx):
         else:
             return await ctx.respond(notInVoice)
     except:
-        print(f"{aERR}(/j){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (/j)')
         return await ctx.respond(isError, ephemeral = True)
 
 @myClient.slash_command(
@@ -193,8 +214,7 @@ async def l(ctx):
         else:
             return await ctx.respond(notInVoice, ephemeral = True)
     except:
-        print(f"{aERR}(/l){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (/l)')
         return await ctx.respond(isError, ephemeral = True)
 
 @myClient.slash_command(
@@ -208,22 +228,21 @@ async def r(ctx):
             await j(ctx)
         myVoiceConnection = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            myPlayer = myVoiceConnection.stop()
+            myVoiceConnection.stop()
             await ctx.respond(isSkipped, ephemeral = True)
             myRandom = random.choice(myOptions)
             myRandom = myDirectory + myRandom
             mySource = FFmpegPCMAudio(myRandom)
-            myPlayer = myVoiceConnection.play(mySource)
+            myVoiceConnection.play(mySource)
             return await ctx.respond(isPlaying, ephemeral = True)
         else:
             myRandom = random.choice(myOptions)
             myRandom = myDirectory + myRandom
             mySource = FFmpegPCMAudio(myRandom)
-            myPlayer = myVoiceConnection.play(mySource)
+            myVoiceConnection.play(mySource)
             return await ctx.respond(isPlaying, ephemeral = True)
     except:
-        print(f"{aERR}(/r){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (/r)')
         return await ctx.respond(isError, ephemeral = True)
 
 # redraws the list with words containing typed characters
@@ -243,22 +262,21 @@ async def audio(ctx, ogg: str):
             await j(ctx)
         voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            player = voice.stop()
+            voice.stop()
             await ctx.respond(isSkipped, ephemeral = True)
             source = FFmpegPCMAudio(myDirectory + ogg)
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
-            player = voice.play(source)
+            voice.play(source)
             return await ctx.respond(isPlaying, ephemeral = True)
         else:
             source = FFmpegPCMAudio(myDirectory + ogg)
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
-            player = voice.play(source)
+            voice.play(source)
             return await ctx.respond(isPlaying, ephemeral = True)
     except:
-        print(f"{aERR}(/p){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (/p)')
         return await ctx.respond(isError, ephemeral = True)
 
 @myClient.slash_command(
@@ -272,13 +290,12 @@ async def s(ctx):
             return await ctx.respond(notInVoice, ephemeral = True)
         else: voice = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            player = voice.stop()
+            voice.stop()
             return await ctx.respond(isSkipped, ephemeral = True)
         else:
             return await ctx.respond(notPlaying, ephemeral = True)
     except:
-        print(f"{aERR}(/s){Style.RESET_ALL}" + 
-            f"{aINFO}\n")
+        debugERROR('An error occurred when trying to run (/s)')
         return await ctx.respond(isError, ephemeral = True)
 
 ############################################################################################################### SLASH COMMANDS
@@ -295,7 +312,7 @@ async def s(ctx):
 #         return await ctx.respond(not_in, ephemeral = True)                                                  #
 #     else: voice = ctx.guild.voice_client                                                                    #
 #     source = FFmpegPCMAudio("your_resource")                                                                #
-#     player = voice.play(source)                                                                             #
+#     voice.play(source)                                                                             #
 #     await ctx.respond("⏯️ now playing...", ephemeral = True)                                                #
 ###############################################################################################################
 
@@ -308,5 +325,5 @@ try:
     token = str(os.getenv("TOKEN"))
     myClient.run(token)
 except discord.errors.LoginFailure:
-    print(f"{aFAIL}" + 
-    f"\n       {Back.BLUE} (INFO) '.env' is the culprit {Style.RESET_ALL}\n")
+    debugFAIL('A catastrophic failure occurred when loading .env file')
+    debugINFO('Is your .env file well formed? Is the TOKEN correct?')
