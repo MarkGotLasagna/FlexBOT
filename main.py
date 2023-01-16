@@ -19,22 +19,22 @@ from discord import FFmpegPCMAudio, option
 # will fix Windows command prompt colors
 just_fix_windows_console()
 
-# for debugging, use this to print messages to terminal
-def debugOK(arg1, arg2):
-    OK = ' (OK) '
-    print(f"{Back.LIGHTBLACK_EX}{OK}{str(arg1)} {str(arg2)} {Style.RESET_ALL}")
-
-def debugINFO(arg1):
-    INFO = ' (INFO) '
-    print(f"{Back.BLUE}{INFO}{arg1} {Style.RESET_ALL}")
-
-def debugERROR(arg1):
-    ERROR = ' (ERROR) '
-    print(f"{Back.RED}{ERROR}{arg1} {Style.RESET_ALL}")
-
-def debugFAIL(arg1):
-    FAIL = ' (FAIL) '
-    print(f"{Back.RED}{FAIL}{arg1} {Style.RESET_ALL}")
+######################################################################################################################## DEBUGGING
+# use this functions to print to terminal, useful info                                                                 #
+########################################################################################################################
+def debugOK(arg1, arg2):                                                                                               #                                                                                               
+    OK = ' (OK) '                                                                                                      #
+    print(f"{Back.LIGHTBLACK_EX}{OK}{str(arg1)} {str(arg2)} {Style.RESET_ALL}")                                        #
+def debugINFO(arg1):                                                                                                   #
+    INFO = ' (INFO) '                                                                                                  #
+    print(f"{Back.BLUE}{INFO}{arg1} {Style.RESET_ALL}")                                                                #
+def debugERROR(arg1):                                                                                                  #
+    ERROR = ' (ERROR) '                                                                                                #
+    print(f"{Back.RED}{ERROR}{arg1} {Style.RESET_ALL}")                                                                #
+def debugFAIL(arg1):                                                                                                   #
+    FAIL = ' (FAIL) '                                                                                                  #
+    print(f"{Back.RED}{FAIL}{arg1} {Style.RESET_ALL}")                                                                 #
+########################################################################################################################
 
 ############################################################################################################# TIMING
 # to check for slowdowns in the code                                                                        #
@@ -55,12 +55,11 @@ class Timer:                                                                    
             raise TimerError(f"Timer not running")                                                          #
         elapsed_time = time.perf_counter() - self._start_time                                               #
         self._start_time = None                                                                             #
-        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")    #
+        print(f"{Back.LIGHTBLACK_EX} Elapsed time:{elapsed_time: 0.10f} seconds {Style.RESET_ALL}")         #
 myTempo = Timer()                                                                                           #
 #############################################################################################################
 
 myTempo.start()
-
 myBotName = "FlexBOT 💽" # change it to your liking
 myDirectory = "/home/maruko/Documents/program-files/FlexBOT/audio/" # needs a trailing "/"
 
@@ -82,7 +81,6 @@ isStillPlaying = "`⚠️`: still playing"
 isPlaying = "`⏯️`: playing"
 isError = "`🚫`: some internal error happened"
 
-# myIntents = discord.Intents.default()
 try:
     myIntents = discord.Intents(
         messages = True,
@@ -191,7 +189,7 @@ async def j(ctx):
         if(ctx.author.voice):
             channel = ctx.author.voice.channel
             try: 
-                voice = await channel.connect()
+                await channel.connect()
                 return await ctx.respond(isConnected)
             except discord.errors.ClientException:
                 return await ctx.respond(isInVoice)
@@ -260,20 +258,20 @@ async def audio(ctx, ogg: str):
     try:
         if ctx.guild.voice_client is None:
             await j(ctx)
-        voice = ctx.guild.voice_client
+        myVoiceConnection = ctx.guild.voice_client
         if ctx.guild.voice_client.is_playing():
-            voice.stop()
+            myVoiceConnection.stop()
             await ctx.respond(isSkipped, ephemeral = True)
             source = FFmpegPCMAudio(myDirectory + ogg)
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
-            voice.play(source)
+            myVoiceConnection.play(source)
             return await ctx.respond(isPlaying, ephemeral = True)
         else:
             source = FFmpegPCMAudio(myDirectory + ogg)
             if (ogg) not in myOptions:
                 return await ctx.respond(notFound, ephemeral = True)
-            voice.play(source)
+            myVoiceConnection.play(source)
             return await ctx.respond(isPlaying, ephemeral = True)
     except:
         debugERROR('An error occurred when trying to run (/p)')
