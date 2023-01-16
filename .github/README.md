@@ -18,14 +18,11 @@
 └── README.md
 ```
 
-The BOT's token, used for _logging in_ to the WebSocket, should reside in a file called `.env` with the following syntax:
-```
-TOKEN = yourSecretTOKEN
-```
 ## How it works
 FlexBOT 💽's purpose is <u>to play audio sources</u>, <u>stored in some local directory</u>, <u>into a Discord voice channel</u>.</br>
 The directory to be used is declared in `myDirectory`. </br>
 Registered guilds are declared inside `myGuilds`.</br>
+The BOT's TOKEN should reside inside the `.env` file.
 
 _Audio sources_ are to be intended as __audio files__ in `.ogg` format, since they provide a good balance between bitrate and therefore size.</br>
 > keep in mind that changing the audio format may change performances considerably and HTTP errors may occur frequently (unsuccessful handshakes or DNS lookups)</br>
