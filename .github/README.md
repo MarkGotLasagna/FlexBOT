@@ -95,9 +95,6 @@ python3 main.py
 your bot will start execution and print to terminal the logs.
 
 ## Sources
-This project is currently ONLINE on [heroku.com](http://www.heroku.com/).
-
-
 Where I started my journey:
 - [Py-cord Documentation](https://docs.pycord.dev/en/stable/)
 - ["James S" YouTube playlist](https://www.youtube.com/playlist?list=PL-7Dfw57ZZVRB4N7VWPjmT0Q-2FIMNBMP)
